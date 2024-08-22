@@ -1,7 +1,7 @@
 "use client";
 
-import { fabric } from "fabric";
-import { useEffect, useRef, useState } from "react";
+import * as fabric  from "fabric";
+import { MutableRefObject, RefObject, useEffect, useRef, useState } from "react";
 
 import { useMutation, useRedo, useStorage, useUndo } from "@/liveblocks.config";
 import {
@@ -283,14 +283,18 @@ const Home = () => {
      *
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
+     * 
+     * 
      */
-    canvas.on("mouse:down", (options) => {
+
+    
+    canvas.on("mouse:down", (options: any) => {
       handleCanvasMouseDown({
         options,
         canvas,
         selectedShapeRef,
         isDrawing,
-        shapeRef,
+        shapeRef: shapeRef as MutableRefObject<any>,
       });
     });
 
@@ -301,7 +305,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("mouse:move", (options) => {
+    canvas.on("mouse:move", (options: any) => {
       handleCanvaseMouseMove({
         options,
         canvas,
@@ -324,10 +328,11 @@ const Home = () => {
         canvas,
         isDrawing,
         shapeRef,
-        activeObjectRef,
+        activeObjectRef: activeObjectRef as MutableRefObject<any>,
         selectedShapeRef,
         syncShapeInStorage,
         setActiveElement,
+        // shapeRef as MutableRefObject<any>,
       });
     });
 
@@ -339,7 +344,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("path:created", (options) => {
+    canvas.on("path:created", (options: any) => {
       handlePathCreated({
         options,
         syncShapeInStorage,
@@ -355,7 +360,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("object:modified", (options) => {
+    canvas.on("object:modified", (options: any) => {
       handleCanvasObjectModified({
         options,
         syncShapeInStorage,
@@ -369,7 +374,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas?.on("object:moving", (options) => {
+    canvas?.on("object:moving", (options: any) => {
       handleCanvasObjectMoving({
         options,
       });
@@ -382,7 +387,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("selection:created", (options) => {
+    canvas.on("selection:created", (options: any) => {
       handleCanvasSelectionCreated({
         options,
         isEditingRef,
@@ -397,7 +402,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("object:scaling", (options) => {
+    canvas.on("object:scaling", (options: any) => {
       handleCanvasObjectScaling({
         options,
         setElementAttributes,
@@ -411,7 +416,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("mouse:wheel", (options) => {
+    canvas.on("mouse:wheel", (options: any) => {
       handleCanvasZoom({
         options,
         canvas,
@@ -482,7 +487,7 @@ const Home = () => {
   // render the canvas when the canvasObjects from live storage changes
   useEffect(() => {
     renderCanvas({
-      fabricRef,
+      fabricRef: fabricRef as MutableRefObject<any>,
       canvasObjects,
       activeObjectRef,
     });
@@ -499,8 +504,8 @@ const Home = () => {
 
           handleImageUpload({
             file: e.target.files[0],
-            canvas: fabricRef as any,
-            shapeRef,
+            canvas: fabricRef as RefObject<any>,
+            shapeRef: shapeRef as MutableRefObject<any>,
             syncShapeInStorage,
           });
         }}
@@ -515,9 +520,9 @@ const Home = () => {
         <RightSidebar
           elementAttributes={elementAttributes}
           setElementAttributes={setElementAttributes}
-          fabricRef={fabricRef}
+          fabricRef={fabricRef as RefObject<any>}
           isEditingRef={isEditingRef}
-          activeObjectRef={activeObjectRef}
+          activeObjectRef={activeObjectRef as RefObject<any>}
           syncShapeInStorage={syncShapeInStorage}
         />
       </section>
