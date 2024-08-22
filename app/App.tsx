@@ -1,7 +1,7 @@
 "use client";
 
-import * as fabric  from "fabric";
-import { MutableRefObject, RefObject, useEffect, useRef, useState } from "react";
+import { fabric } from "fabric";
+import { useEffect, useRef, useState } from "react";
 
 import { useMutation, useRedo, useStorage, useUndo } from "@/liveblocks.config";
 import {
@@ -283,18 +283,17 @@ const Home = () => {
      *
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
-     * 
-     * 
      */
+    const fabricInstance = fabricRef.current; // Store a stable reference
 
-    
-    canvas.on("mouse:down", (options: any) => {
+    // Your event listeners here...
+    fabricInstance?.on("mouse:down", (options) => {
       handleCanvasMouseDown({
         options,
-        canvas,
+        canvas: fabricInstance,
         selectedShapeRef,
         isDrawing,
-        shapeRef: shapeRef as MutableRefObject<any>,
+        shapeRef,
       });
     });
 
@@ -305,10 +304,10 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("mouse:move", (options: any) => {
+    fabricInstance?.on("mouse:move", (options) => {
       handleCanvaseMouseMove({
         options,
-        canvas,
+        canvas: fabricInstance,
         isDrawing,
         selectedShapeRef,
         shapeRef,
@@ -323,18 +322,19 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("mouse:up", () => {
+    fabricInstance?.on("mouse:up", () => {
       handleCanvasMouseUp({
-        canvas,
+        canvas: fabricInstance,
         isDrawing,
         shapeRef,
-        activeObjectRef: activeObjectRef as MutableRefObject<any>,
+        activeObjectRef,
         selectedShapeRef,
         syncShapeInStorage,
         setActiveElement,
-        // shapeRef as MutableRefObject<any>,
       });
-    });
+    })
+
+    
 
     /**
      * listen to the path created event on the canvas which is fired when
@@ -344,7 +344,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("path:created", (options: any) => {
+    canvas.on("path:created", (options) => {
       handlePathCreated({
         options,
         syncShapeInStorage,
@@ -360,7 +360,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("object:modified", (options: any) => {
+    canvas.on("object:modified", (options) => {
       handleCanvasObjectModified({
         options,
         syncShapeInStorage,
@@ -374,7 +374,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas?.on("object:moving", (options: any) => {
+    canvas?.on("object:moving", (options) => {
       handleCanvasObjectMoving({
         options,
       });
@@ -387,7 +387,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("selection:created", (options: any) => {
+    canvas.on("selection:created", (options) => {
       handleCanvasSelectionCreated({
         options,
         isEditingRef,
@@ -402,7 +402,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("object:scaling", (options: any) => {
+    canvas.on("object:scaling", (options) => {
       handleCanvasObjectScaling({
         options,
         setElementAttributes,
@@ -416,7 +416,7 @@ const Home = () => {
      * Event inspector: http://fabricjs.com/events
      * Event list: http://fabricjs.com/docs/fabric.Canvas.html#fire
      */
-    canvas.on("mouse:wheel", (options: any) => {
+    canvas.on("mouse:wheel", (options) => {
       handleCanvasZoom({
         options,
         canvas,
@@ -470,11 +470,11 @@ const Home = () => {
           canvas: null,
         });
       });
-
+      const a = fabricRef.current;
       window.removeEventListener("keydown", (e) =>
         handleKeyDown({
           e,
-          canvas: fabricRef.current,
+          canvas: a,
           undo,
           redo,
           syncShapeInStorage,
@@ -482,16 +482,18 @@ const Home = () => {
         })
       );
     };
-  }, [canvasRef]); // run this effect only once when the component mounts and the canvasRef changes
+
+    
+  }, [canvasRef, deleteShapeFromStorage, redo, syncShapeInStorage, undo]); // run this effect only once when the component mounts and the canvasRef changes
 
   // render the canvas when the canvasObjects from live storage changes
   useEffect(() => {
     renderCanvas({
-      fabricRef: fabricRef as MutableRefObject<any>,
+      fabricRef,
       canvasObjects,
       activeObjectRef,
     });
-  }, [canvasObjects]);
+  }, [canvasObjects, deleteShapeFromStorage, redo, syncShapeInStorage, undo]);
 
   return (
     <main className='h-screen overflow-hidden'>
@@ -504,8 +506,8 @@ const Home = () => {
 
           handleImageUpload({
             file: e.target.files[0],
-            canvas: fabricRef as RefObject<any>,
-            shapeRef: shapeRef as MutableRefObject<any>,
+            canvas: fabricRef as any,
+            shapeRef,
             syncShapeInStorage,
           });
         }}
@@ -520,9 +522,9 @@ const Home = () => {
         <RightSidebar
           elementAttributes={elementAttributes}
           setElementAttributes={setElementAttributes}
-          fabricRef={fabricRef as RefObject<any>}
+          fabricRef={fabricRef}
           isEditingRef={isEditingRef}
-          activeObjectRef={activeObjectRef as RefObject<any>}
+          activeObjectRef={activeObjectRef}
           syncShapeInStorage={syncShapeInStorage}
         />
       </section>

@@ -25,6 +25,7 @@ const ShapesMenu = ({
               src={isDropdownElem ? activeElement.icon : item.icon}
               alt={item.name}
               fill
+              sizes="1rem"
               className={isDropdownElem ? "invert" : ""}
             />
           </Button>
@@ -45,6 +46,8 @@ const ShapesMenu = ({
                 <Image
                   src={elem?.icon as string}
                   alt={elem?.name as string}
+                  fill
+                  sizes="1.4rem"
                   width={20}
                   height={20}
                   className={activeElement.value === elem?.value ? "invert" : ""}
